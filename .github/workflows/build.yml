@@ -1,0 +1,44 @@
+name: Build Hugo Auction
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository herunterladen
+        uses: actions/checkout@v4
+
+      - name: Java 21 installieren
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Gradle installieren
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+
+      - name: Projekt-ZIP entpacken
+        run: |
+          mkdir project
+          unzip -q *.zip -d project
+          echo "Gefundene Dateien:"
+          find project -name build.gradle -o -name settings.gradle
+
+      - name: Mod bauen
+        run: |
+          PROJECT=$(dirname "$(find project -name build.gradle | head -1)")
+          echo "Projektordner: $PROJECT"
+          cd "$PROJECT"
+          gradle build
+
+      - name: JAR hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: HugoAuction-1.21.11
+          path: project/**/build/libs/*.jar
