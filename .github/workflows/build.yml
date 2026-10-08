@@ -18,24 +18,25 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Gradle installieren
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.2.0'
-
       - name: Projekt-ZIP entpacken
         run: |
           mkdir project
           unzip -q *.zip -d project
-          echo "Gefundene Dateien:"
-          find project -name build.gradle -o -name settings.gradle
+          echo "Projektdateien:"
+          find project -maxdepth 3 -type f
+
+      - name: Gradle Wrapper vorbereiten
+        run: |
+          PROJECT=$(dirname "$(find project -name build.gradle | head -1)")
+          cd "$PROJECT"
+          gradle wrapper --gradle-version 8.14.3
+          chmod +x gradlew
 
       - name: Mod bauen
         run: |
           PROJECT=$(dirname "$(find project -name build.gradle | head -1)")
-          echo "Projektordner: $PROJECT"
           cd "$PROJECT"
-          gradle build
+          ./gradlew build --refresh-dependencies --no-daemon
 
       - name: JAR hochladen
         uses: actions/upload-artifact@v4
