@@ -29,7 +29,7 @@ jobs:
         run: |
           PROJECT=$(dirname "$(find project -name build.gradle | head -1)")
           cd "$PROJECT"
-          gradle wrapper --gradle-version 8.14.3
+          gradle wrapper --gradle-version 9.2.0
           chmod +x gradlew
 
       - name: Mod bauen
